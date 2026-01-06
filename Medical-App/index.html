@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Lending Protocol</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/lucid-cardano@0.10.11/web/mod.js" type="module"></script>
+    <style>
+        /* All your existing CSS stays exactly the same */
+        :root {
+            --medical-blue: #0ea5e9;
+            --medical-light: #38bdf8;
+            --medical-dark: #0284c7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c4a6e 0%, #0f172a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--medical-blue);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(to right, #0ea5e9, #38bdf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+        
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 992px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .wallet-section, .lending-section {
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: #cbd5e1;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(14, 165, 233, 0.3);
+        }
+        
+        .section-title i {
+            color: var(--medical-blue);
+        }
+        
+        .wallet-info {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .wallet-info p {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            color: #94a3b8;
+            word-break: break-all;
+        }
+        
+        .wallet-info strong {
+            color: #cbd5e1;
+        }
+        
+        .wallet-balance {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(14, 165, 233, 0.1);
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid var(--medical-blue);
+        }
+        
+        .balance-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .balance-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--medical-light);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            margin: 5px 0;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--medical-blue) 0%, var(--medical-dark) 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--medical-light) 0%, var(--medical-blue) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #0da871 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #34d399 0%, var(--success) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #fbbf24 0%, var(--warning) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .input-with-unit {
+            position: relative;
+        }
+        
+        .input-with-unit input {
+            width: 100%;
+            padding: 14px 60px 14px 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            border-radius: 10px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .input-with-unit input:focus {
+            outline: none;
+            border-color: var(--medical-blue);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+        
+        .unit {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        
+        .lending-info {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .info-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .info-value {
+            color: #cbd5e1;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .status-section {
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            margin-bottom: 40px;
+        }
+        
+        .log-container {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 120px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            line-height: 1.5;
+            border: 1px solid #334155;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .log-time {
+            color: #60a5fa;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+        
+        .log-message {
+            color: #cbd5e1;
+        }
+        
+        .log-error {
+            color: #f87171;
+        }
+        
+        .log-success {
+            color: #34d399;
+        }
+        
+        .log-warning {
+            color: #fbbf24;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #94a3b8;
+            border-top: 1px solid #334155;
+            margin-top: 20px;
+        }
+        
+        .protocol-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(14, 165, 233, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-top: 15px;
+            border: 1px solid rgba(14, 165, 233, 0.5);
+        }
+        
+        .protocol-badge i {
+            color: var(--medical-blue);
+        }
+        
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .warning-box i {
+            color: var(--warning);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .warning-box p {
+            color: #fbbf24;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .lending-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .smart-contract-info {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid var(--medical-blue);
+        }
+        
+        .contract-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        
+        .contract-item i {
+            color: var(--medical-blue);
+            width: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .app-grid {
+                gap: 20px;
+            }
+            
+            .wallet-section, .lending-section {
+                padding: 20px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .lending-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--medical-blue);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(14, 165, 233, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .interest-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .interest-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            color: #38bdf8;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .interest-btn:hover {
+            background: rgba(14, 165, 233, 0.2);
+            border-color: var(--medical-blue);
+        }
+        
+        .interest-btn.active {
+            background: rgba(14, 165, 233, 0.3);
+            border-color: var(--medical-blue);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="fade-in">
+            <div class="logo">
+                <i class="fas fa-hand-holding-usd logo-icon"></i>
+                <h1>Coxygen Medical Lending App</h1>
+            </div>
+            <p class="subtitle">
+                Secure medical lending on Cardano. Patients can access credit for medical bills with transparent terms.
+            </p>
+            <div class="protocol-badge">
+                <i class="fas fa-file-contract"></i>
+                <span>Smart Contract • Cardano Blockchain</span>
+            </div>
+        </header>    
+                
+        <!-- Fixed: Only one app-grid div -->
+        <div class="app-grid">
+            <!-- Welcome & Description Section -->
+            <section class="wallet-section fade-in">
+                <h2 class="section-title"><i class="fas fa-heart"></i> Welcome to Medical Lending</h2>
+                
+                <div class="wallet-info">
+                    <h3 style="color: var(--medical-light); margin-bottom: 15px;">What This App Does</h3>
+                    <p style="line-height: 1.6; margin-bottom: 15px;">
+                        This is a <strong>decentralized medical lending platform</strong> built on Cardano blockchain. 
+                        It allows patients to secure credit for medical bills using smart contracts.
+                    </p>
+                    
+                    <h4 style="color: #94a3b8; margin: 15px 0 10px 0;">How It Works:</h4>
+                    <ol style="padding-left: 20px; line-height: 1.6; margin-bottom: 15px;">
+                        <li><strong>Deposit Collateral</strong> - Lock ADA as your credit limit</li>
+                        <li><strong>Open Medical Credit</strong> - Pay medical bills immediately</li>
+                        <li><strong>Repay Later</strong> - Get your collateral back minus interest</li>
+                        <li><strong>Provider Gets Paid</strong> - Medical facilities receive payment instantly</li>
+                    </ol>
+                    
+                    <div style="background: rgba(14, 165, 233, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <h4 style="color: var(--medical-light); margin-bottom: 10px;">Benefits:</h4>
+                        <ul style="padding-left: 20px; line-height: 1.6;">
+                            <li>No credit checks required</li>
+                            <li>Transparent interest rates</li>
+                            <li>Instant provider payments</li>
+                            <li>Secure on-chain transactions</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        
+            <section class="wallet-section fade-in">
+                <h2 class="section-title"><i class="fas fa-wallet"></i> Wallet Connection</h2>
+                
+           <div class="wallet-info">
+                    <p><strong>Network:</strong> <span id="network">Not connected</span></p>
+                    <p><strong>Patient Address:</strong> <span id="walletAddress">Please connect your wallet</span></p>
+                    <p><strong>Smart Contract:</strong> <span id="scriptAddress">addr_test1qplutus...</span></p>
+                </div> 
+
+                <button id="connect" class="btn btn-primary">
+                    <i class="fas fa-plug"></i> Connect Wallet
+                </button>
+                
+                <button id="disconnect" class="btn" style="background: #64748b; display: none;">
+                    <i class="fas fa-power-off"></i> Disconnect
+                </button>
+                
+            
+            <!-- Lending Operations Section -->
+            <section class="lending-section fade-in">
+                <h2 class="section-title"><i class="fas fa-heartbeat"></i> Lending Operations</h2>
+                
+                <!-- Collateral Input -->
+                <div class="form-group">
+                    <label for="collateral">Collateral Amount (ADA)</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="collateral" min="10" step="1" value="1000">
+                        <span class="unit">ADA</span>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 5px;">This serves as your credit limit</p>
+                </div>
+                
+                <!-- Bill Amount -->
+                <div class="form-group">
+                    <label for="billAmount">Medical Bill Amount (ADA)</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="billAmount" min="10" step="1" value="500">
+                        <span class="unit">ADA</span>
+                    </div>
+                </div>
+                
+                <!-- Interest Button Section -->
+                <div class="form-group">
+                    <label for="interest">Interest Amount (ADA)</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="interest" min="1" step="0.5" value="25">
+                        <span class="unit">ADA</span>
+                    </div>
+                </div>
+                
+                <!-- Provider PubKeyHash -->
+                <div class="form-group">
+                    <label for="lender">Medical Provider Wallet</label>
+                    <div class="input-with-unit">
+                        <input type="text" id="lender" placeholder="addr_test1... or pubkeyhash">
+                        <span class="unit"><i class="fas fa-hospital-user"></i></span>
+                    </div>
+                </div>
+                
+                <!-- Lending Info -->
+
+                
+                <!-- Action Buttons -->
+                <div class="lending-actions">
+                    <button id="openCreditBtn" class="btn btn-success">
+                        <i class="fas fa-credit-card"></i> Open Credit
+                    </button>
+                    
+                    <button id="repayCreditBtn" class="btn btn-warning">
+                        <i class="fas fa-coins"></i> Repay Credit
+                    </button>
+                </div>
+                
+                <div class="warning-box">
+                    <i class="fas fa-info-circle"></i>
+                    <p><strong>Smart Contract Terms:</strong> Collateral serves as credit limit. Patient must sign to open credit. Repayment returns collateral minus interest to patient.</p>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Transaction Log Section -->
+        <section class="status-section fade-in">
+            <h2 class="section-title"><i class="fas fa-history"></i> Transaction Log</h2>
+            <div class="log-container" id="log">
+                <div class="log-entry">
+                    <span class="log-time">[System]</span>
+                    <span class="log-message">Medical Lending Protocol initialized. Connect wallet to begin.</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-time">Thank You!</span>
+                    <span class="log-message">Coxygen Medical Lending App • Built with ❤️ on Cardano</span>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Coxygen Medical Lending App • Secure Healthcare Financing on Cardano</p>
+            <div class="protocol-badge">
+                <i class="fas fa-code-branch"></i>
+                <span>• Fixed Interest • Transparent Terms</span>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-file-contract"></i> Confirm Transaction</h3>
+            <p id="modalMessage">Please review the transaction details:</p>
+            <div id="modalDetails" style="background: rgba(15,23,42,0.6); padding: 15px; border-radius: 8px; margin: 15px 0;"></div>
+            <div class="modal-actions">
+                <button id="confirmAction" class="btn btn-success" style="flex: 1;">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+                <button id="cancelAction" class="btn" style="flex: 1; background: #64748b;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="loadingModal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-spinner loading"></i> Processing...</h3>
+            <p id="loadingMessage">Building and signing your transaction...</p>
+        </div>
+    </div>
+
+    <script type="module" src="app.js" defer></script>
+</body>
+</html>
